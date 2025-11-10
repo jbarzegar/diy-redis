@@ -8,14 +8,6 @@ import (
 	"strings"
 )
 
-type Command struct {
-	Kind      Datatype
-	Primitive DatatypePrimitive
-	Value     string
-	// Only set when "Kind" is Array
-	Args []Command
-}
-
 type RespParser struct {
 	reader *bufio.Reader
 }

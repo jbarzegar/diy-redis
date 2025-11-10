@@ -3,6 +3,14 @@ package respparser
 // LE is the standard line endings for RESP
 const LE = "\r\n"
 
+type Command struct {
+	Kind      Datatype
+	Primitive DatatypePrimitive
+	Value     string
+	// Only set when "Kind" is Array
+	Args []Command
+}
+
 // DatatypePrimitive are literal symbols RESP uses to denote datatypes
 type DatatypePrimitive string
 
