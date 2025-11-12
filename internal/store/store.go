@@ -48,7 +48,6 @@ func (s *Store) Del(keys ...string) (int, error) {
 	for _, key := range keys {
 		_, ok := s.data[key]
 		if !ok {
-			// return ErrNotFound
 			continue
 		}
 

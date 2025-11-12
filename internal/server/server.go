@@ -16,11 +16,9 @@ type Server struct {
 	buf       []byte
 }
 
-// func (*s Server)
 func NewServer() (*Server, error) {
 	ln, err := net.Listen("tcp", ":6379")
 	if err != nil {
-		// log.Fatal(err)
 		return &Server{}, err
 	}
 	// make a byte array of the max TCP packet size
