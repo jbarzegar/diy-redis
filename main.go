@@ -9,18 +9,6 @@ import (
 	"strings"
 )
 
-type Command struct {
-	Name string
-}
-
-func CmdOK() []byte {
-	return []byte("+OK\r\n")
-}
-
-func printRawCmd(b []byte) {
-	fmt.Printf("%q\n", strings.Trim(string(b), "\x00"))
-}
-
 func main() {
 	// start a network connection
 	//
@@ -48,18 +36,27 @@ func main() {
 			log.Fatal(err)
 		}
 		str := strings.Trim(string(buf), "\x00")
-		fmt.Printf("%q\n", str)
 		reader := respparser.NewRespParser(strings.NewReader(str))
-		result, err := reader.Read()
+		command, err := reader.Read()
 		if err != nil {
 			conn.Write([]byte("+ParsingError\r\n"))
 			continue
 		}
 
-		s := fmt.Sprintf("+%v(%v)\r\n", result.Kind, result.Args)
-		conn.Write([]byte(s))
-
-		// conn.Write(CmdOK())
+		if command.Kind == respparser.DatatypeArray {
+			headCmd := command.Args[0]
+			handleCommand(conn, headCmd)
+		}
 		continue
+	}
+}
+
+func handleCommand(con net.Conn, c respparser.Command, args ...[]respparser.Command) {
+	fmt.Println(c.Value, c)
+	switch c.Value {
+	case "PING":
+		con.Write([]byte("+\"PONG\"\r\n"))
+	default:
+		con.Write([]byte("-\"UNSUPPORTED\"\r\n"))
 	}
 }
