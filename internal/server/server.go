@@ -61,22 +61,39 @@ func (s *Server) HandleArgs(command respparser.Command) {
 	s.Conn.Write(response)
 }
 
+func WriteResponse(datatype respparser.DatatypePrimitive, content string) []byte {
+	str := fmt.Appendf([]byte{}, "%v%v\r\n", datatype, content)
+	return str
+}
+
 func printIntResponse(n int) []byte {
-	return fmt.Appendf([]byte{}, "+(integer) %v\r\n", n)
+	return WriteResponse(
+		respparser.SIMPLE_STRING,
+		fmt.Sprintf("(integer) %v", n),
+	)
 }
 
 func (s *Server) HandleCommand(c respparser.Command, args []respparser.Command) []byte {
 	switch strings.ToUpper(c.Value) {
 	case "PING":
-		return []byte("+\"PONG\"\r\n")
+		return WriteResponse(
+			respparser.SIMPLE_STRING,
+			"\"PONG\"",
+		)
 	case "SET":
 		key := args[0].Value
 		val := args[1].Value
 		s.store.Set(key, val)
-		return []byte("+\"OK\"\r\n")
+		return WriteResponse(
+			respparser.SIMPLE_STRING,
+			"\"OK\"",
+		)
 	case "GET":
 		item, _ := s.store.Get(args[0].Value)
-		return fmt.Appendf([]byte{}, "+\"%v\"\r\n", item.Value)
+		return WriteResponse(
+			respparser.SIMPLE_STRING,
+			fmt.Sprintf("\"%v\"", item.Value),
+		)
 	case "EXISTS":
 		vals := []string{c.Value}
 		for _, a := range args {
@@ -92,6 +109,9 @@ func (s *Server) HandleCommand(c respparser.Command, args []respparser.Command) 
 		count, _ := s.store.Del(keys...)
 		return printIntResponse(count)
 	default:
-		return []byte("-\"UNSUPPORTED\"\r\n")
+		return WriteResponse(
+			respparser.ERROR,
+			"\"UNSUPPORTED\"",
+		)
 	}
 }
