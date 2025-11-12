@@ -5,7 +5,7 @@ I was curious. So I wanted to start building my own redis to learn something fun
 
 # Commands to support
 - [x] `PING`
-- [ ] `SET`
-- [ ] `GET`
-- [ ] `DEL`
-- [ ] `EXISTS`
+- [x] `SET`
+- [x] `GET`
+- [x] `DEL`
+- [x] `EXISTS`
